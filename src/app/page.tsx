@@ -19,7 +19,7 @@ function App() {
     }
     console.log("getNonce");
     console.log(address);
-    const query = `{
+    const query = `mutation GetNonce {
         nonce(address: "${address}")
     }`;
 
