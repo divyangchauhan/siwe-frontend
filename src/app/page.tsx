@@ -11,6 +11,7 @@ function App() {
   const [nonce, setNonce] = useState("");
   const [signature, setSignature] = useState("");
   const [message, setMessage] = useState("");
+  const [jwt, setJwt] = useState("");
   const { signMessage } = useSignMessage();
 
   async function getNonce(address: string | undefined) {
@@ -93,6 +94,7 @@ function App() {
     }).then((res) => res.json());
 
     console.log(data);
+    setJwt(data.login);
     return data;
   }
 
@@ -150,6 +152,7 @@ function App() {
           <button onClick={() => login(message, signature)}>
             Signin Using Siwe
           </button>
+          "Jwt" {jwt}
         </div>
       )}
     </>
