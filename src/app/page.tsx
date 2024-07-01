@@ -94,7 +94,7 @@ function App() {
     }).then((res) => res.json());
 
     console.log(data);
-    setJwt(data.login);
+    setJwt(data.login.access_token);
     return data;
   }
 
