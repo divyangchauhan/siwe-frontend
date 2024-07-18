@@ -41,6 +41,8 @@ function App() {
     if (address === undefined) {
       return null;
     }
+    const expirationTime = new Date();
+    expirationTime.setDate(expirationTime.getDate() + 14);
 
     const message = new SiweMessage({
       domain: window.location.host,
@@ -50,6 +52,7 @@ function App() {
       version: "1",
       chainId: 1,
       nonce: nonce,
+      expirationTime: expirationTime.toISOString(),
     });
 
     const signature = signMessage(
@@ -75,7 +78,7 @@ function App() {
     console.log(message);
 
     const query = `mutation Login {
-      login(message: "${message.replace(/\n/g, "\\n")}", signature: "${signature}")
+      login(message: "${message.replace(/\n/g, "\\n")}", signature: "${signature}") 
     }
     `;
 
