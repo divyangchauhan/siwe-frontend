@@ -13,6 +13,8 @@ function App() {
   const [message, setMessage] = useState("");
   const [jwt, setJwt] = useState("");
   const { signMessage } = useSignMessage();
+  const [presignedUrl, setPresignedUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState(Object);
 
   async function getNonce(address: string | undefined) {
     if (address === undefined) {
@@ -101,6 +103,54 @@ function App() {
     return data;
   }
 
+  const getPresignedUrl = async () => {
+    if (!selectedFile) {
+      alert("Please select a file to get a presigned URL first.");
+      return;
+    }
+
+    const query = `mutation getPresignedUrl {
+      getPresignedUrl(filename: "${selectedFile.name}")
+    }
+    `;
+
+    const { data } = await fetch("http://localhost:3000/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        operationName: "getPresignedUrl",
+        variables: {},
+        query: query,
+      }),
+    }).then((res) => res.json());
+    setPresignedUrl(data.getPresignedUrl);
+  };
+
+  const handleFileSelect = (event: any) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  const uploadFile = async () => {
+    if (!selectedFile || !presignedUrl) {
+      alert("Please select a file and get a presigned URL first.");
+      return;
+    }
+
+    const response = await fetch(presignedUrl, {
+      method: "PUT",
+      body: selectedFile,
+    });
+
+    if (response.ok) {
+      alert("File uploaded successfully.");
+    } else {
+      alert("File upload failed.");
+    }
+  };
+
   return (
     <>
       <div>
@@ -156,6 +206,12 @@ function App() {
             Signin Using Siwe
           </button>
           "Jwt" {jwt}
+          <br />
+          <br />
+          <div>File Upload</div>
+          <button onClick={getPresignedUrl}>Get Presigned URL</button>
+          <input type="file" onChange={handleFileSelect} />
+          <button onClick={uploadFile}>Upload File</button>
         </div>
       )}
     </>
