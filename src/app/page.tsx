@@ -110,7 +110,7 @@ function App() {
     }
 
     const query = `mutation getPresignedUrl {
-      getPresignedUrl(filename: "${selectedFile.name}")
+      getPresignedUrl(filename: "${selectedFile.name}", appname: KlerosCourt)
     }
     `;
 
