@@ -3,6 +3,7 @@
 import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { useState } from "react";
 import { SiweMessage } from "siwe";
+import CryptoJS from "crypto-js";
 
 function App() {
   const account = useAccount();
@@ -15,7 +16,8 @@ function App() {
   const { signMessage } = useSignMessage();
   const [presignedUrl, setPresignedUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState(Object);
-
+  const [fileHash, setfileHash] = useState("");
+  const [fileType, setFileType] = useState("");
   async function getNonce(address: string | undefined) {
     if (address === undefined) {
       return null;
@@ -110,7 +112,7 @@ function App() {
     }
 
     const query = `mutation getPresignedUrl {
-      getPresignedUrl(filename: "${selectedFile.name}", appname: KlerosCourt)
+      getPresignedUrl(filename: "${selectedFile.name}", appname: KlerosCourt, fileType: "${fileType}", fileHash: "${fileHash}")
     }
     `;
 
@@ -130,6 +132,19 @@ function App() {
   };
 
   const handleFileSelect = (event: any) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const wordArray = CryptoJS.lib.WordArray.create(e?.target?.result);
+        const hash = CryptoJS.MD5(wordArray).toString();
+        setfileHash(hash);
+        const fileType = file.type;
+        setFileType(fileType);
+      };
+      reader.readAsArrayBuffer(file);
+    }
     setSelectedFile(event.target.files[0]);
   };
 
@@ -142,6 +157,10 @@ function App() {
     const response = await fetch(presignedUrl, {
       method: "PUT",
       body: selectedFile,
+      headers: {
+        "Content-Type": fileType,
+        "Content-MD5": fileHash,
+      },
     });
 
     if (response.ok) {
