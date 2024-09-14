@@ -3,7 +3,6 @@
 import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { useState } from "react";
 import { SiweMessage } from "siwe";
-import CryptoJS from "crypto-js";
 
 function App() {
   const account = useAccount();
@@ -137,9 +136,13 @@ function App() {
     if (file) {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const wordArray = CryptoJS.lib.WordArray.create(e?.target?.result);
-        const hash = CryptoJS.MD5(wordArray).toString();
-        setfileHash(hash);
+        const arrayBuffer = e.target?.result as ArrayBuffer;
+        const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        setfileHash(hashHex);
         const fileType = file.type;
         setFileType(fileType);
       };
@@ -159,7 +162,7 @@ function App() {
       body: selectedFile,
       headers: {
         "Content-Type": fileType,
-        "Content-MD5": fileHash,
+        "X-Amz-Checksum-Sha256": fileHash,
       },
     });
 
