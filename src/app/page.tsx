@@ -110,8 +110,8 @@ function App() {
       return;
     }
 
-    const query = `mutation getPresignedUrl {
-      getPresignedUrl(filename: "${selectedFile.name}", appname: KlerosCourt, fileType: "${fileType}", fileHash: "${fileHash}")
+    const query = `mutation createUploadUrl {
+      createUploadUrl(filename: "${selectedFile.name}", appname: KlerosCourt, fileType: "${fileType}", fileHash: "${fileHash}")
     }
     `;
 
@@ -122,7 +122,7 @@ function App() {
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        operationName: "getPresignedUrl",
+        operationName: "createUploadUrl",
         variables: {},
         query: query,
       }),
