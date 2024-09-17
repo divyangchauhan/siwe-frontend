@@ -100,7 +100,9 @@ function App() {
     }).then((res) => res.json());
 
     console.log(data);
-    setJwt(data.login.accessToken);
+    const accessToken = data.login.accessToken;
+    document.cookie = `jwt=${accessToken}; path=/; max-age=3600; SameSite=Strict; Secure`;
+    setJwt(accessToken);
     return data;
   }
 
@@ -115,11 +117,16 @@ function App() {
     }
     `;
 
+    const accessToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("jwt="))
+      ?.split("=")[1];
+
     const { data } = await fetch("http://localhost:3000/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
         operationName: "createUploadUrl",
