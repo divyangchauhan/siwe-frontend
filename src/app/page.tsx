@@ -146,10 +146,8 @@ function App() {
         const arrayBuffer = e.target?.result as ArrayBuffer;
         const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("");
-        setfileHash(hashHex);
+        const hashBase64 = btoa(String.fromCharCode(...hashArray));
+        setfileHash(hashBase64);
         const fileType = file.type;
         setFileType(fileType);
       };
