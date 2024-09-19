@@ -134,7 +134,7 @@ function App() {
         query: query,
       }),
     }).then((res) => res.json());
-    setPresignedUrl(data.getPresignedUrl);
+    setPresignedUrl(data.createUploadUrl);
   };
 
   const handleFileSelect = (event: any) => {
